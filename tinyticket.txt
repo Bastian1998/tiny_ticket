@@ -1,0 +1,16 @@
+Propuesta de Proyecto: Plataforma de Venta y Gestión de Entradas a Pequeña Escala
+Descripción general
+
+El proyecto consiste en el desarrollo de una aplicación web/móvil que permite a cualquier persona u organización crear y publicar eventos propios, indicando lugar, fecha y disponibilidad de cupos, y ofrecer las entradas de forma paga o gratuita según decida el organizador. En esencia, es una versión reducida y simplificada de plataformas como Ticketmaster, pensada específicamente para eventos de pequeña y mediana escala que hoy no encuentran un espacio adecuado en las plataformas grandes por su volumen o por los costos asociados.
+
+Problema que resuelve
+
+Los organizadores de eventos pequeños —artistas independientes, galerías de arte, bares con shows en vivo, organizadores de fiestas privadas o semiprivadas— suelen manejar la venta y reserva de entradas de forma manual: listas en papel, planillas compartidas, transferencias por chat o simplemente "a la gorra" en la puerta. Esto genera pérdida de control sobre la capacidad del lugar, dificultad para cobrar de forma ordenada y nula visibilidad sobre cuántas entradas quedan disponibles en tiempo real. La plataforma centraliza todo ese proceso en un solo lugar, sin la complejidad ni el costo de una solución pensada para grandes estadios o giras.
+
+Usuarios del sistema
+
+Se identifican dos roles principales: el organizador, que crea el evento definiendo nombre, ubicación, fecha, cupo disponible y si las entradas son pagas o gratuitas; y el asistente, que navega los eventos disponibles, reserva o compra su entrada y recibe la confirmación correspondiente. Opcionalmente puede considerarse un rol administrador de la plataforma para moderar eventos publicados.
+
+Funcionalidades principales
+
+Entre las funciones centrales se incluyen: publicación de eventos con sus datos básicos (título, descripción, ubicación, fecha y hora, capacidad máxima); gestión de disponibilidad de cupos en tiempo real, evitando que se vendan más entradas de las que el lugar permite; dos modalidades de acceso, entrada gratuita con reserva simple y entrada paga con cobro a través de la app; panel del organizador para ver ventas, cupos restantes y datos de asistentes; y generación de una entrada digital (con código o QR) que el asistente presenta al ingresar al evento.

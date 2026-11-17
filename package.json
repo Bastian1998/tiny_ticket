@@ -1,0 +1,22 @@
+{
+  "name": "tiny-ticket",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TinyTicket - plataforma de venta y gestion de entradas para eventos de pequena escala (TP Final ISW2)",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev -w server\" \"npm run dev -w client\"",
+    "seed": "npm run seed -w server",
+    "test": "npm test -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "build": "npm run build -w server && npm run build -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

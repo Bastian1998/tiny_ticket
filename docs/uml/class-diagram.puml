@@ -1,0 +1,180 @@
+@startuml TinyTicket_Clases
+' Diagrama de clases del modelo de dominio de TinyTicket.
+' Generado a partir del código en server/src/domain y server/src/services.
+' Renderizar con PlantUML (https://www.plantuml.com/plantuml) o importar en draw.io
+' (menú Insertar > Avanzado > PlantUML).
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+package "Usuarios" {
+  abstract class User {
+    +id: string
+    +name: string
+    +email: string
+    {abstract} +role: Role
+    {abstract} +can(action: Action): boolean
+    +assertCan(action: Action): void
+  }
+  class Organizer {
+    +organizationName: string
+    +can(action: Action): boolean
+  }
+  class Attendee {
+    +can(action: Action): boolean
+  }
+  class Admin {
+    +can(action: Action): boolean
+  }
+  class UserFactory {
+    {static} +create(role: Role, props): User
+  }
+  User <|-- Organizer
+  User <|-- Attendee
+  User <|-- Admin
+  UserFactory ..> User : crea
+}
+
+package "Eventos" {
+  enum EventStatus {
+    PUBLISHED
+    CANCELLED
+    REMOVED
+  }
+  class Event {
+    -id: string
+    -organizerId: string
+    -title: string
+    -description: string
+    -location: string
+    -startsAt: Date
+    -capacity: number
+    -availableSeats: number
+    -price: number
+    -status: EventStatus
+    -removalReason: string
+    -version: number
+    {static} +create(organizerId, input): Event
+    {static} +restore(snapshot): Event
+    +soldSeats(): number
+    +isFree(): boolean
+    +isSoldOut(): boolean
+    +isBookable(now): boolean
+    +isOwnedBy(userId): boolean
+    +reserveSeats(quantity: number): void
+    +releaseSeats(quantity: number): void
+    +changeCapacity(newCapacity: number): void
+    +updateDetails(input): void
+    +cancel(): void
+    +remove(reason: string): void
+  }
+  Event --> EventStatus
+}
+
+package "Entradas" {
+  enum TicketStatus {
+    VALID
+    USED
+    CANCELLED
+  }
+  abstract class Ticket {
+    +id: string
+    +code: string
+    +eventId: string
+    +attendeeId: string
+    +issuedAt: Date
+    -status: TicketStatus
+    -usedAt: Date
+    {abstract} +kind: TicketKind
+    {abstract} +getPrice(): number
+    +isValid(): boolean
+    +markUsed(now): void
+  }
+  class FreeTicket {
+    +getPrice(): number
+  }
+  class PaidTicket {
+    +price: number
+    +paymentId: string
+    +paymentMethod: string
+    +getPrice(): number
+  }
+  class TicketFactory {
+    {static} +issue(event, attendeeId, payment): Ticket
+    {static} +generateCode(): string
+  }
+  Ticket <|-- FreeTicket
+  Ticket <|-- PaidTicket
+  Ticket --> TicketStatus
+  TicketFactory ..> Ticket : crea
+}
+
+package "Pagos (Strategy)" {
+  interface PaymentStrategy {
+    +method: PaymentMethod
+    +pay(request: PaymentRequest): PaymentResult
+  }
+  class FreePaymentStrategy
+  class MercadoPagoPaymentStrategy <<mock>>
+  class CardPaymentStrategy <<mock>>
+  class PaymentProcessor {
+    -strategy: PaymentStrategy
+    +setStrategy(s: PaymentStrategy): void
+    +process(request: PaymentRequest): PaymentResult
+  }
+  class PaymentStrategyFactory {
+    +forEvent(event: Event, method): PaymentStrategy
+  }
+  PaymentStrategy <|.. FreePaymentStrategy
+  PaymentStrategy <|.. MercadoPagoPaymentStrategy
+  PaymentStrategy <|.. CardPaymentStrategy
+  PaymentProcessor o--> "1" PaymentStrategy
+  PaymentStrategyFactory ..> PaymentStrategy
+}
+
+package "Servicios" {
+  class ReservationService {
+    +reserve(attendee: User, request): ReservationResult
+  }
+  class EventService {
+    +listPublic(search): EventView[]
+    +getDetail(id): EventView
+    +create(organizer, input): Event
+    +update(organizer, id, input): Event
+    +cancel(organizer, id): Event
+  }
+  class OrganizerDashboardService {
+    +getDashboard(organizer): DashboardSummary
+    +getAttendees(organizer, eventId): AttendeeRow[]
+  }
+  class TicketValidationService <<mock>> {
+    +validate(organizer, code): ValidationOutcome
+  }
+  class ModerationService <<mock>> {
+    +listAll(admin): Event[]
+    +removeEvent(admin, eventId, reason): Event
+  }
+  interface NotificationService {
+    +sendTicketConfirmation(attendee, event, tickets): void
+  }
+  class MockEmailNotificationService <<mock>>
+  NotificationService <|.. MockEmailNotificationService
+}
+
+' Relaciones del dominio
+Organizer "1" -- "0..*" Event : organiza >
+Attendee "1" -- "0..*" Ticket : posee >
+Event "1" *-- "0..*" Ticket : emite >
+
+' Dependencias de los servicios
+ReservationService ..> Event
+ReservationService ..> TicketFactory
+ReservationService ..> PaymentProcessor
+ReservationService ..> PaymentStrategyFactory
+ReservationService ..> NotificationService
+EventService ..> Event
+OrganizerDashboardService ..> Ticket
+TicketValidationService ..> Ticket
+ModerationService ..> Event
+@enduml

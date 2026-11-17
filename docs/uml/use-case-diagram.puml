@@ -1,0 +1,60 @@
+@startuml TinyTicket_CasosDeUso
+' Diagrama de casos de uso de TinyTicket (punto de partida, refinar en el informe).
+' (mock) = simulado en el prototipo.
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Asistente" as Attendee
+actor "Organizador" as Organizer
+actor "Administrador" as Admin
+actor "Pasarela de pago\n(Mercado Pago / tarjeta)" as Gateway <<sistema>>
+
+rectangle "TinyTicket" {
+  usecase "Iniciar sesión (mock)" as UC0
+  usecase "Explorar eventos" as UC1
+  usecase "Ver detalle de evento" as UC2
+  usecase "Reservar entrada gratuita" as UC3
+  usecase "Comprar entrada paga" as UC4
+  usecase "Controlar cupo\n(evitar sobreventa)" as UC5
+  usecase "Pagar (mock)" as UC6
+  usecase "Recibir entrada con QR" as UC7
+  usecase "Recibir mail de confirmación (mock)" as UC8
+  usecase "Ver mis entradas" as UC9
+
+  usecase "Publicar evento" as UC10
+  usecase "Editar evento" as UC11
+  usecase "Cancelar evento" as UC12
+  usecase "Ver panel: ventas, cupos\ny asistentes" as UC13
+  usecase "Validar entrada en la puerta (mock)" as UC14
+
+  usecase "Moderar eventos (mock)" as UC15
+  usecase "Dar de baja evento" as UC16
+}
+
+Attendee --> UC0
+Attendee --> UC1
+Attendee --> UC2
+Attendee --> UC3
+Attendee --> UC4
+Attendee --> UC9
+
+Organizer --> UC0
+Organizer --> UC10
+Organizer --> UC11
+Organizer --> UC12
+Organizer --> UC13
+Organizer --> UC14
+
+Admin --> UC0
+Admin --> UC15
+
+UC3 ..> UC5 : <<include>>
+UC4 ..> UC5 : <<include>>
+UC4 ..> UC6 : <<include>>
+UC6 --> Gateway
+UC3 ..> UC7 : <<include>>
+UC4 ..> UC7 : <<include>>
+UC7 ..> UC8 : <<include>>
+UC1 <.. UC2 : <<extend>>
+UC15 <.. UC16 : <<extend>>
+@enduml
